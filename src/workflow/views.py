@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.urls import reverse
+from django.http import HttpResponse
 
 from security.decorators import editor_user_required, has_journal
 from submission import models as submission_models
@@ -52,3 +53,11 @@ def manage_article_workflow(request, article_id):
     }
 
     return render(request, template, context)
+
+
+@has_journal
+@editor_user_required
+def workflow_overview(request):
+
+
+    return HttpResponse('')
