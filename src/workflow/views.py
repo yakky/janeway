@@ -58,6 +58,13 @@ def manage_article_workflow(request, article_id):
 @has_journal
 @editor_user_required
 def workflow_overview(request):
+    article_list = submission_models.Article.objects.exclude(
+        stage=submission_models.STAGE_UNSUBMITTED
+    )
 
+    template = 'workflow/workflow_overview.html'
+    context = {
+        'article_list': article_list,
+    }
 
-    return HttpResponse('')
+    return render(request, template, context)
