@@ -531,6 +531,8 @@ def send_email(user, form, request, article):
         message,
         log_dict=log_dict,
         cc=form.cleaned_data['cc'],
+        bcc=form.cleaned_data['bcc'],
+        attachment=form.cleaned_data['attachments'],
     )
 
 
