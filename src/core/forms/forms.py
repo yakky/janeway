@@ -19,9 +19,10 @@ from django.db.models import Q
 from django_summernote.widgets import SummernoteWidget
 
 from core import models, validators
+from core.forms.fields import TagitField
 from utils.logic import get_current_request
 from journal import models as journal_models
-from utils import setting_handler
+from utils import render_template, setting_handler
 from utils.forms import KeywordModelForm, JanewayTranslationModelForm, CaptchaForm, HTMLDateInput
 from utils.logger import get_logger
 from submission import models as submission_models
@@ -651,3 +652,48 @@ class ConfirmableForm(forms.Form):
     def is_confirmed(self):
         return self.CONFIRMED_BUTTON_NAME in self.data
 
+
+class EmailForm(forms.Form):
+    subject = forms.CharField(max_length=1000)
+    cc = TagitField(
+        required=False,
+        max_length=10000,
+    )
+    bcc = TagitField(
+        required=False,
+        max_length=10000,
+    )
+    body = forms.CharField(widget=SummernoteWidget)
+    attachments = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        required=False,
+    )
+
+
+class SettingEmailForm(EmailForm):
+    """ An Email form that populates initial data using Janeway email settings
+
+    During initialization, the email and subject settings are retrieved,
+    matching the given setting_name
+    :param setting_name: The name of the setting (Group must be email)
+    :param email_context: A dict of the context required to populate the email
+    :param request: The instance of this HttpRequest
+    :param journal: (Optional) an instance of journal.models.Journal
+    """
+    def __init__(self, *args, **kwargs):
+        setting_name = kwargs.pop("setting_name")
+        email_context = kwargs.pop("email_context")
+        subject_setting_name = "subject_" + setting_name
+        journal = kwargs.pop("journal", None)
+        request = kwargs.pop("request")
+        initial_subject = setting_handler.get_email_subject(
+            setting_name=subject_setting_name,
+            journal=journal,
+        )
+        super().__init__(*args, **kwargs)
+        self.fields["subject"].initial = initial_subject
+        self.fields["body"].initial = render_template.get_message_content(
+            request,
+            email_context,
+            setting_name,
+        )
