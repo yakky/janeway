@@ -60,6 +60,9 @@ INSTALLED_APPS = [
     'django.contrib.postgres',
 
     # Installed Apps
+    # Install APP is loaded first to ensure all existing models and migrations
+    # relying on installation procedures won't fail
+    'install',
     'cms',
     'core',
     'copyediting',
@@ -80,7 +83,6 @@ INSTALLED_APPS = [
     'submission',
     'transform',
     'utils',
-    'install',
     'workflow',
 
     # 3rd Party
@@ -492,13 +494,26 @@ DEFAULT_XSL_FILE_LABEL = 'Janeway default (1.4.3)'
 if (
     IN_TEST_RUNNER
     and "--keepdb" not in COMMAND
-    and os.environ.get("DB_VENDOR") == "sqlite"
 ):
     from collections.abc import Mapping
 
 
     class SkipMigrations(Mapping):
         def __getitem__(self, key):
+            """ Ensures the install migrations run before syncing db
+
+            Django's migration executor will always pre_render database state from
+            the models of unmigrated apps before running those declared in
+            MIGRATION_MODULES. As a result, we can't run the install migrations
+            first, while skipping the remaining migrations. Instead, we run
+            the required SQL here.
+            """
+            if key == 'install':
+                from django.db import connection
+                if connection.vendor == "postgresql":
+                    cursor = connection.cursor()
+                    cursor.execute("CREATE EXTENSION IF NOT EXISTS citext;")
+
             return None
 
         def __contains__(self, key):
@@ -512,6 +527,7 @@ if (
 
     logging.info("Skipping migrations")
     logging.disable(logging.CRITICAL)
+
     MIGRATION_MODULES = SkipMigrations()
 
 # A potentially dangerous feature, this allows superusers to hijack and control a user's account.
@@ -555,3 +571,9 @@ CORE_THEMES = [
     'clean',
 ]
 INSTALLATION_BASE_THEME = 'OLH'
+
+# Use pagination for all of our APIs based on Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
+}
