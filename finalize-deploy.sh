@@ -14,7 +14,7 @@ $PYTHON manage.py migrate
 $PYTHON manage.py build_assets
 $PYTHON manage.py collectstatic --noinput
 
-$PYTHON manage.py add_coauthors_submission_email_settings.py
-$PYTHON manage.py add_generic_analytics_code_setting.py
-$PYTHON manage.py add_publication_alert_settings.py
-$PYTHON manage.py add_user_as_main_author_setting.py
+$PYTHON manage.py add_coauthors_submission_email_settings
+$PYTHON manage.py add_generic_analytics_code_setting
+$PYTHON manage.py add_publication_alert_settings
+$PYTHON manage.py add_user_as_main_author_setting
