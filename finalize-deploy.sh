@@ -8,7 +8,7 @@ fi
 PYTHON=$1
 
 $PYTHON manage.py link_plugins
-$PYTHON manage.py install_themes.py
+$PYTHON manage.py install_themes
 
 $PYTHON manage.py migrate
 $PYTHON manage.py build_assets
