@@ -45,10 +45,9 @@ build_janeway_image:
   services:
     - docker:dind
   variables:
-    TAG: "registry.gitlab.sissamedialab.it/wjs/janeway/debian-python-git-janeway"
+    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway"
   script:
-    - env
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $TAG || true
-    - DOCKER_BUILDKIT=1 docker build --tag $TAG --cache-from $TAG --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - docker build --tag $TAG --cache-from $TAG --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
