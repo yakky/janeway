@@ -22,6 +22,9 @@ deploy_to_test:
     - if: $CI_COMMIT_BRANCH == "jcom"
 
 
+services:
+  - docker:dind
+
 build_janeway_image:
   stage: build
   tags:
