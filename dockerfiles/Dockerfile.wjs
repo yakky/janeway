@@ -1,11 +1,12 @@
 # A docker image with Janeway ready to `runserver` from branch jcom.
 FROM debian:11-slim
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip  \
-    # apt-get update && \
-    # apt-get install -y file && \
-    # apt-get install -y python3 pip && \
+    --mount=type=cache,target=/var/cache/apt \
+    apt-get update && \
+    apt-get install -y file && \
+    apt-get install -y python3 pip && \
     apt-get install -y git && \
-    # apt-get install -y mariadb-client && \
+    apt-get install -y mariadb-client && \
     git clone --depth 1 https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sissamedialab.it/wjs/janeway.git && \
     cd janeway && \
     git checkout jcom && \
