@@ -67,5 +67,5 @@ build_janeway_image:
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $TAG || true
-    - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg CI_JOB_TOKEN=$CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
