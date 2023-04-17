@@ -34,4 +34,4 @@ build_janeway_image:
   script:
     - DOCKER_BUILDKIT=1 docker build --tag $TAG --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
-  when: manual
+  # when: manual

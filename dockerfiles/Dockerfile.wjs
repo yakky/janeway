@@ -6,8 +6,8 @@ RUN --mount=type=cache,mode=0755,target=/root/.cache/pip  \
     # apt-get install -y python3 pip && \
     # apt-get install -y git && \
     # apt-get install -y mariadb-client && \
+    echo ${GIT_ACCESS_TOKEN}
     git clone --depth 1 https://git:${GIT_ACCESS_TOKEN}@gitlab.sissamedialab.it/wjs/janeway.git && \
-    ls && \
     cd janeway && \
     git checkout jcom && \
     # sed -i 's/jsmin.*/jsmin/' requirements.txt && \
