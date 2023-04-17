@@ -1,40 +1,42 @@
-# TODO: drop `pip install wjs...` (done elsewhere)
-# TODO: use deploy.sh script (ssh ForcedCommand anyway...)
+stages:
+  - build
+  - deploy
 
-# Authenticate with the Container Registry
-# https://docs.gitlab.com/ee/user/packages/container_registry/authenticate_with_container_registry.html
+include:
+  - project: 'wjs/wjs-profile-project'
+    ref: master
+    file: '.gitlab-ci-pkg-deploy.yml'
+
 
 deploy_to_test:
-  stage: deploy
+  extends:
+    - .deploy
   tags:
     - inasset
-  image: python:3.9
-
   variables:
-    PIP: "/home/wjs/.virtualenvs/j1-venv/bin/pip"
-    UWSGI_VASSAL: "/home/wjs/uwsgi/janeway.ini"
-
-  script:
-    - echo "Deploy to test instance"
-    - chmod og= $ID_RSA
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "( cd janeway && git checkout jcom && git pull --ff-only https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sissamedialab.it/wjs/janeway jcom && $PIP install --index-url=$PIP_INDEX_URL -U wjs.jcom_profile && touch --no-dereference $UWSGI_VASSAL )"
+    SERVER_IP: "$TEST_SERVER_IP"
+    SERVER_USER: "$TEST_SERVER_USER"
+    DEPLOY_CMD: "deploy-janeway"
   environment:
     name: jcom-test
     url: https://janeway-test.sissamedialab.it/
   rules:
     - if: $CI_COMMIT_BRANCH == "jcom"
 
-# build_janeway_image:
-#   stage: build
-#   tags:
-#     - dind
-#   variables:
-#     TAG: "registry.gitlab.sissamedialab.it/wjs/wjs-profile-project/debian-python-git-janeway"
-#   script:
-#     - docker login -u $CI_REGISTRY_USER -p $CI_GROUP_REGISTRY_PUSH_TOKEN_VARIABLE registry.gitlab.sissamedialab.it
-#     - docker pull $TAG || true
-#     - DOCKER_BUILDKIT=1 docker build --tag $TAG --cache-from $TAG --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
-#     - docker push $TAG
+
+deploy_to_production:
+  extends:
+    - .deploy
+  tags:
+    - inasset
+  variables:
+    SERVER_IP: "$PROD_SERVER_IP"
+    SERVER_USER: "$PROD_SERVER_USER"
+    DEPLOY_CMD: "deploy-janeway"
+  environment:
+    name: production
+    url: https://journals.sissamedialab.it/
+  when: manual
 
 
 build_janeway_image:
@@ -62,10 +64,16 @@ build_janeway_image:
   variables:
     TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway"
 
-  # To cache from the previous image, see
+  # To cache from the previous image (--cache-from), see
   # https://docs.docker.com/engine/reference/commandline/build/#cache-from
+  #
+  # To authenticate with the Container Registry, see
+  # https://docs.gitlab.com/ee/user/packages/container_registry/authenticate_with_container_registry.html
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $TAG || true
     - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg CI_JOB_TOKEN=$CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "jcom"
