@@ -1,6 +1,9 @@
 # TODO: drop `pip install wjs...` (done elsewhere)
 # TODO: use deploy.sh script (ssh ForcedCommand anyway...)
 
+# Authenticate with the Container Registry
+# https://docs.gitlab.com/ee/user/packages/container_registry/authenticate_with_container_registry.html
+
 deploy_to_test:
   stage: deploy
   tags:
@@ -31,6 +34,7 @@ build_janeway_image:
   variables:
     TAG: "registry.gitlab.sissamedialab.it/wjs/wjs-profile-project/debian-python-git-janeway"
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.sissamedialab.it
-    - DOCKER_BUILDKIT=1 docker build --tag $TAG --build-arg CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - docker login -u $CI_REGISTRY_USER -p $CI_JOB_TOKEN registry.gitlab.sissamedialab.it
+    - docker pull $TAG || true
+    - DOCKER_BUILDKIT=1 docker build --tag $TAG --cache-from $TAG --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG

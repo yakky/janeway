@@ -3,16 +3,6 @@ FROM debian:11-slim
 ARG CI_JOB_TOKEN
 ENV CI_JOB_TOKEN ${CI_JOB_TOKEN}
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip  \
-    --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,mode=0755,target=/var/cache/apt \
     apt-get update && \
-    apt-get install -y file && \
-    apt-get install -y python3 pip && \
-    apt-get install -y git && \
-    apt-get install -y mariadb-client && \
-    git clone --depth 1 https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sissamedialab.it/wjs/janeway.git && \
-    cd janeway && \
-    git checkout jcom && \
-    # sed -i 's/jsmin.*/jsmin/' requirements.txt && \
-    sed -i '/mysqlclient/d' requirements.txt && \
-    pip install 'setuptools<58' && \
-    pip install -r requirements.txt
+    apt-get install tree
