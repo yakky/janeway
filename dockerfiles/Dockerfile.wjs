@@ -1,5 +1,7 @@
 # A docker image with Janeway ready to `runserver` from branch jcom.
 FROM debian:11-slim
+ARG CI_JOB_TOKEN
+ENV CI_JOB_TOKEN ${CI_JOB_TOKEN}
 RUN --mount=type=cache,mode=0755,target=/root/.cache/pip  \
     --mount=type=cache,target=/var/cache/apt \
     apt-get update && \

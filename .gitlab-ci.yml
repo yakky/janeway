@@ -32,6 +32,6 @@ build_janeway_image:
   variables:
     TAG: "registry.gitlab.sissamedialab.it/wjs/wjs-profile-project/debian-python-git-janeway"
   script:
-    - DOCKER_BUILDKIT=1 docker build --tag $TAG --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - DOCKER_BUILDKIT=1 docker build --tag $TAG --build-arg CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
   # when: manual
