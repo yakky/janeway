@@ -45,7 +45,5 @@ build_prova_image:
     TAG: "registry.gitlab.sissamedialab.it/wjs/wjs-profile-project/prova"
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY/prova:latest
-    - echo "CI REGISTRY: $CI_REGISTRY"
     - echo -e 'FROM busybox\nRUN echo "hello world"' | docker build --tag $CI_REGISTRY/prova:latest -
-    # - docker login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PASSWORD}" registry.gitlab.sissamedialab.it
-    - docker push $TAG
+    - docker push  $CI_REGISTRY/prova:latest
