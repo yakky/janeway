@@ -39,15 +39,33 @@ deploy_to_test:
 
 build_janeway_image:
   stage: build
+
+  # Important: runners that should support dind must have
+  # volumes = ["/certs/client",...
+  # privileged = true
   tags:
     - dind
     - inasset
+
+  # We get
+  # *** WARNING: Service ... probably didn't start properly.
+  # Ignore for now; see:
+  # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4550
   services:
     - docker:dind
+
+  # I wasn't able to find a way to use the group-level container registry from CI/CD
+  # See https://gitlab.com/gitlab-org/gitlab/-/issues/218285
+  # So here I just use the project's registry.
+  # TODO: verify that other wjs-profile-project can pull from this registry
+  # (the image is used in it's test stage)
   variables:
     TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway"
+
+  # To cache from the previous image, see
+  # https://docs.docker.com/engine/reference/commandline/build/#cache-from
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $TAG || true
-    - docker build --tag $TAG --cache-from $TAG --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg $CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
