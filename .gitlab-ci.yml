@@ -24,9 +24,6 @@ deploy_to_test:
   rules:
     - if: $CI_COMMIT_BRANCH == "jcom"
 
-services:
-  - docker:dind
-
 # build_janeway_image:
 #   stage: build
 #   tags:
@@ -45,6 +42,8 @@ build_janeway_image:
   tags:
     - dind
     - inasset
+  services:
+    - docker:dind
   variables:
     TAG: "registry.gitlab.sissamedialab.it/wjs/debian-python-git-janeway"
   script:
