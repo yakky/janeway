@@ -41,6 +41,7 @@ build_janeway_image:
   stage: build
   tags:
     - dind
+    - inasset
   services:
     - docker:dind
   variables:
