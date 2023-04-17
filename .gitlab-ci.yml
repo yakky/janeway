@@ -31,5 +31,4 @@ build_janeway_image:
   script:
     - DOCKER_BUILDKIT=1 docker build --tag $TAG --build-arg GIT_ACCESS_TOKEN ./dockerfiles/Dockerfile.wjs
     - docker push $TAG
-  rules:
-    - if: $CI_COMMIT_BRANCH == "${CI_COMMIT_REF_NAME}"
+  when: manual
