@@ -1,42 +1,79 @@
-# TODO: refactor
-# TODO: drop `pip install wjs...` (done elsewhere)
-# TODO: what about `manage.py makemigrations --merge`?
+stages:
+  - build
+  - deploy
+
+include:
+  - project: 'wjs/wjs-profile-project'
+    ref: master
+    file: '.gitlab-ci-pkg-deploy.yml'
+
 
 deploy_to_test:
-  stage: deploy
+  extends:
+    - .deploy
   tags:
     - inasset
-  image: python:3.9
-
   variables:
-    PIP: "/home/wjs/.virtualenvs/j1-venv/bin/pip"
-    UWSGI_VASSAL: "/home/wjs/uwsgi/janeway.ini"
-
-  script:
-    - echo "Deploy to test instance"
-    - chmod og= $ID_RSA
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "( cd janeway && git checkout jcom && git pull --ff-only https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sissamedialab.it/wjs/janeway jcom && $PIP install --index-url=$PIP_INDEX_URL -U wjs.jcom_profile && touch --no-dereference $UWSGI_VASSAL )"
+    SERVER_IP: "$TEST_SERVER_IP"
+    SERVER_USER: "$TEST_SERVER_USER"
+    DEPLOY_CMD: "deploy-janeway"
   environment:
     name: jcom-test
     url: https://janeway-test.sissamedialab.it/
   rules:
     - if: $CI_COMMIT_BRANCH == "jcom"
 
-deploy_to_pp:
-  stage: deploy
+
+deploy_to_production:
+  extends:
+    - .deploy
   tags:
     - inasset
-  image: python:3.9
-
   variables:
-    PIP: "/home/wjs/.virtualenvs/j-pp/bin/pip"
-    UWSGI_VASSAL: "/home/wjs/uwsgi/janeway-pp.ini"
-
-  script:
-    - echo "Deploy to pre-productions instance"
-    - chmod og= $ID_RSA
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "( cd janeway-pp && git checkout jcom && git pull --ff-only https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sissamedialab.it/wjs/janeway jcom && $PIP install --index-url=$PIP_INDEX_URL -U wjs.jcom_profile && touch --no-dereference $UWSGI_VASSAL )"
+    SERVER_IP: "$PROD_SERVER_IP"
+    SERVER_USER: "$PROD_SERVER_USER"
+    DEPLOY_CMD: "deploy-janeway"
   environment:
-    name: jcom-test
-    url: https://janeway-pp.sissamedialab.it/
+    name: production
+    url: https://journals.sissamedialab.it/
   when: manual
+
+
+build_janeway_image:
+  stage: build
+
+  # Important: runners that should support dind must have
+  # volumes = ["/certs/client",...
+  # privileged = true
+  tags:
+    - dind
+    - inasset
+
+  # We get
+  # *** WARNING: Service ... probably didn't start properly.
+  # Ignore for now; see:
+  # https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4550
+  services:
+    - docker:dind
+
+  # I wasn't able to find a way to use the group-level container registry from CI/CD
+  # See https://gitlab.com/gitlab-org/gitlab/-/issues/218285
+  # So here I just use the project's registry.
+  # TODO: verify that other wjs-profile-project can pull from this registry
+  # (the image is used in it's test stage)
+  variables:
+    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway"
+
+  # To cache from the previous image (--cache-from), see
+  # https://docs.docker.com/engine/reference/commandline/build/#cache-from
+  #
+  # To authenticate with the Container Registry, see
+  # https://docs.gitlab.com/ee/user/packages/container_registry/authenticate_with_container_registry.html
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $TAG || true
+    - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg CI_JOB_TOKEN=$CI_JOB_TOKEN --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
+    - docker push $TAG
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "jcom"
