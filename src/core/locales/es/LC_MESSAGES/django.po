@@ -9,18 +9,20 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-31 11:20+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2023-04-19 15:24+0050\n"
+"Last-Translator: b'Matteo Gamboz <gamboz@medialab.sissa.it>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Translated-Using: django-rosetta 0.9.4\n"
+
 #: comms/models.py:91
 #, python-brace-format
 msgid "Posted by {byline}"
-msgstr ""
+msgstr "Posted by {byline}"
 
 #: comms/models.py:92
 #, python-brace-format
@@ -177,7 +179,8 @@ msgstr ""
 msgid "Name suffix eg. jr"
 msgstr ""
 
-#: core/models.py:221 themes/OLH/templates/core/accounts/public_profile.html:19
+#: core/models.py:221
+#: themes/OLH/templates/core/accounts/public_profile.html:19
 #: themes/clean/templates/core/accounts/public_profile.html:19
 #: themes/material/templates/core/accounts/public_profile.html:19
 msgid "Biography"
@@ -195,7 +198,8 @@ msgstr ""
 msgid "Department"
 msgstr ""
 
-#: core/models.py:236 themes/OLH/templates/core/accounts/public_profile.html:15
+#: core/models.py:236
+#: themes/OLH/templates/core/accounts/public_profile.html:15
 #: themes/clean/templates/core/accounts/public_profile.html:15
 #: themes/material/templates/core/accounts/public_profile.html:15
 msgid "Country"
@@ -239,8 +243,8 @@ msgstr ""
 #: core/validators.py:15
 #, python-brace-format
 msgid ""
-"Extension {extension} is not allowed. Allowed extensions are: {validator."
-"extensions}"
+"Extension {extension} is not allowed. Allowed extensions are: "
+"{validator.extensions}"
 msgstr ""
 
 #: core/validators.py:17
@@ -251,8 +255,8 @@ msgstr ""
 
 #: core/views.py:1906
 msgid ""
-"You cannot remove a section that contains articles. Remove articles from the "
-"section if you want to delete it."
+"You cannot remove a section that contains articles. Remove articles from the"
+" section if you want to delete it."
 msgstr ""
 
 #: discussion/models.py:27
@@ -401,7 +405,8 @@ msgstr ""
 
 #: journal/models.py:601
 msgid ""
-"An ISBN is relevant for non-serial collections such as conference proceedings"
+"An ISBN is relevant for non-serial collections such as conference "
+"proceedings"
 msgstr ""
 
 #: journal/models.py:642 themes/OLH/templates/press/press_journals.html:71
@@ -417,7 +422,7 @@ msgstr ""
 #: themes/material/templates/elements/journal/issue_sidebar.html:8
 #: themes/material/templates/journal/issue.html:8
 msgid "Issue"
-msgstr ""
+msgstr "Edición"
 
 #: journal/models.py:701
 msgid "pages"
@@ -611,7 +616,7 @@ msgstr ""
 #: review/forms.py:361
 #, python-format
 msgid "Author can see ‘%(name)s’"
-msgstr ""
+msgstr "Autores ‘%(name)s’ puede veder "
 
 #: review/models.py:137
 msgid "Anonimity"
@@ -707,8 +712,8 @@ msgstr ""
 
 #: submission/models.py:1751
 msgid ""
-"If checked, this authors email address link will be displayed on the article "
-"page."
+"If checked, this authors email address link will be displayed on the article"
+" page."
 msgstr ""
 
 #: submission/models.py:2067 templates/admin/submission/submit_files.html:69
@@ -902,10 +907,7 @@ msgstr ""
 #: templates/admin/core/manager/sections/section_list.html:26
 msgid ""
 "\n"
-"\t\t\t\t\t\t\t\t\tHere you can create and edit the sections that make up a "
-"typical issue. You can also think of these as article types, since authors "
-"will choose one on submission. To quickly re-order sections, drag and drop "
-"the \n"
+"\t\t\t\t\t\t\t\t\tHere you can create and edit the sections that make up a typical issue. You can also think of these as article types, since authors will choose one on submission. To quickly re-order sections, drag and drop the \n"
 "\t\t\t\t\t\t\t\t\t"
 msgstr ""
 
@@ -916,16 +918,14 @@ msgstr ""
 #: templates/admin/core/manager/sections/section_list.html:31
 msgid ""
 "\n"
-"\t\t\t\t\t\t\t\t\t\tThis will change the order that the author sees these on "
-"the submission page - so you may want to move the most popular or current "
-"sections to the top.\n"
+"\t\t\t\t\t\t\t\t\t\tThis will change the order that the author sees these on the submission page - so you may want to move the most popular or current sections to the top.\n"
 "\t\t\t\t\t\t\t\t\t"
 msgstr ""
 
 #: templates/admin/core/manager/sections/section_list.html:36
 msgid ""
-"You cannot delete a Section that contains articles. Remove the articles from "
-"the section if you want to delete it."
+"You cannot delete a Section that contains articles. Remove the articles from"
+" the section if you want to delete it."
 msgstr ""
 
 #: templates/admin/core/request_submission_access.html:14
@@ -980,8 +980,8 @@ msgstr ""
 
 #: templates/admin/elements/forms/group_journal.html:41
 msgid ""
-"Where you have a journal in your press that is not hosted on Janeway you can "
-"link directly to the journal and submit pages."
+"Where you have a journal in your press that is not hosted on Janeway you can"
+" link directly to the journal and submit pages."
 msgstr ""
 
 #: templates/admin/elements/forms/group_journal.html:48
@@ -1254,8 +1254,7 @@ msgstr ""
 #: templates/admin/journal/manage/languages.html:21
 msgid ""
 "\n"
-"                 This interface allows you to override the press level "
-"languages and set the languages that are available for this journal.\n"
+"                 This interface allows you to override the press level languages and set the languages that are available for this journal.\n"
 "                 "
 msgstr ""
 
@@ -1288,7 +1287,8 @@ msgstr ""
 #: templates/admin/journal/submissions.html:36
 #: themes/OLH/templates/core/accounts/orcid_registration.html:28
 #: themes/OLH/templates/core/base.html:133
-#: themes/OLH/templates/core/login.html:7 themes/OLH/templates/core/nav.html:76
+#: themes/OLH/templates/core/login.html:7
+#: themes/OLH/templates/core/nav.html:76
 #: themes/OLH/templates/elements/journal_footer.html:17
 #: themes/OLH/templates/journal/become_reviewer.html:16
 #: themes/OLH/templates/journal/submissions.html:31
@@ -1413,10 +1413,8 @@ msgstr ""
 #: templates/admin/repository/edit_authors.html:28
 msgid ""
 "\n"
-"                            You can search for an existing author or add "
-"them using the form below. If you\n"
-"                            complete the form with an email address of an "
-"existing user, that user will be added\n"
+"                            You can search for an existing author or add them using the form below. If you\n"
+"                            complete the form with an email address of an existing user, that user will be added\n"
 "                            to the"
 msgstr ""
 
@@ -1479,8 +1477,8 @@ msgstr ""
 #: themes/OLH/templates/repository/authors.html:43
 msgid ""
 "If you cannot find the author record by searching, and you are not the only "
-"author, you can add one by clicking the button below. This will open a popup "
-"modal for you to complete their details."
+"author, you can add one by clicking the button below. This will open a popup"
+" modal for you to complete their details."
 msgstr ""
 
 #: templates/admin/repository/submit/authors.html:70
@@ -1507,7 +1505,8 @@ msgstr ""
 
 #: templates/admin/repository/submit/authors.html:73
 msgid ""
-"You can reorder the authors by dragging and dropping rows in the table below."
+"You can reorder the authors by dragging and dropping rows in the table "
+"below."
 msgstr ""
 
 #: templates/admin/repository/submit/authors.html:103
@@ -1586,13 +1585,8 @@ msgstr ""
 #: templates/admin/review/add_review_assignment.html:28
 msgid ""
 "\n"
-"                        You can select a reviewer using the radio buttons in "
-"the first column and complete the section under \"Set Options\".\n"
-"                        If you cannot find the reviewer you want in this "
-"list you can use \"Enroll Existing User\" to search the database and give "
-"users the Reviewer role, or \"Add New Reviewer\" to create a new account for "
-"a reviewer (this process is silent, they will not receive an account "
-"creation email).\n"
+"                        You can select a reviewer using the radio buttons in the first column and complete the section under \"Set Options\".\n"
+"                        If you cannot find the reviewer you want in this list you can use \"Enroll Existing User\" to search the database and give users the Reviewer role, or \"Add New Reviewer\" to create a new account for a reviewer (this process is silent, they will not receive an account creation email).\n"
 "                        "
 msgstr ""
 
@@ -1638,17 +1632,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                            These files are the versions "
-"sent out to reviewers in Round %(round.round_number)s of review.\n"
+"                                            These files are the versions sent out to reviewers in Round %(round.round_number)s of review.\n"
 "                                            "
 msgstr ""
 
 #: templates/admin/review/in_review.html:200
 msgid ""
 "\n"
-"                                The latest manuscript and figure files for "
-"this article. When a revision task is completed these will be updated with "
-"the latest versions from the authors.\n"
+"                                The latest manuscript and figure files for this article. When a revision task is completed these will be updated with the latest versions from the authors.\n"
 "                                "
 msgstr ""
 
@@ -1676,8 +1667,8 @@ msgstr ""
 
 #: templates/admin/review/projected_issue.html:33
 msgid ""
-"Select an issue from the drop down on the left and press save, this articles "
-"projected issue will now be set."
+"Select an issue from the drop down on the left and press save, this articles"
+" projected issue will now be set."
 msgstr ""
 
 #: templates/admin/review/projected_issue.html:34
@@ -1735,22 +1726,17 @@ msgstr ""
 #: templates/admin/review/view_review.html:36
 msgid ""
 "\n"
-"                        You can make this review available for the author to "
-"see using\n"
-"                        the <em>Review Availability Controls</em> below. You "
-"can also\n"
-"                        make individual review elements hidden or "
-"available.\n"
+"                        You can make this review available for the author to see using\n"
+"                        the <em>Review Availability Controls</em> below. You can also\n"
+"                        make individual review elements hidden or available.\n"
 "                    "
 msgstr ""
 
 #: templates/admin/review/view_review.html:43
 msgid ""
 "\n"
-"                        If you need to make changes to the review you can do "
-"so by\n"
-"                        using the <em>Edit</em> button below each form "
-"element\n"
+"                        If you need to make changes to the review you can do so by\n"
+"                        using the <em>Edit</em> button below each form element\n"
 "                    "
 msgstr ""
 
@@ -1835,10 +1821,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                                            Currently this review is "
-"%(visibility_statement)s. Note that the author\n"
-"                                            must have access to the review "
-"before they can access the review file.\n"
+"                                            Currently this review is %(visibility_statement)s. Note that the author\n"
+"                                            must have access to the review before they can access the review file.\n"
 "                                        "
 msgstr ""
 
@@ -1849,12 +1833,9 @@ msgstr ""
 #: templates/admin/review/view_review.html:179
 msgid ""
 "\n"
-"                                                The toggles below control "
-"the visibility of the individual review form\n"
-"                                                answers. Note that changing "
-"these will have no effect unless the Review is\n"
-"                                                marked as visible to the "
-"author using the <em>Author can access this review</em>\n"
+"                                                The toggles below control the visibility of the individual review form\n"
+"                                                answers. Note that changing these will have no effect unless the Review is\n"
+"                                                marked as visible to the author using the <em>Author can access this review</em>\n"
 "                                                toggle above.\n"
 "                                            "
 msgstr ""
@@ -1866,10 +1847,8 @@ msgstr ""
 #: templates/admin/submission/edit/metadata.html:173
 msgid ""
 "\n"
-"                            You can search the <a href=\"https://www."
-"crossref.org/services/funder-registry/\">\n"
-"                            Crossref Funder Registry</a> to add known "
-"funders.\n"
+"                            You can search the <a href=\"https://www.crossref.org/services/funder-registry/\">\n"
+"                            Crossref Funder Registry</a> to add known funders.\n"
 "                        "
 msgstr ""
 
@@ -1900,14 +1879,14 @@ msgstr ""
 
 #: templates/admin/submission/start.html:24
 msgid ""
-"All authors must agree to the below statements in order to submit an article "
-"to"
+"All authors must agree to the below statements in order to submit an article"
+" to"
 msgstr ""
 
 #: templates/admin/submission/start.html:24
 msgid ""
-"If you do not agree with these terms you will be unable to proceed with your "
-"submission."
+"If you do not agree with these terms you will be unable to proceed with your"
+" submission."
 msgstr ""
 
 #: templates/admin/submission/start.html:29
@@ -2481,8 +2460,7 @@ msgstr ""
 #: themes/material/templates/core/accounts/register.html:38
 msgid ""
 "For more information read our\n"
-"                        <a href=\"#passwordmodal\" class=\"modal-"
-"trigger\">password guide</a>\n"
+"                        <a href=\"#passwordmodal\" class=\"modal-trigger\">password guide</a>\n"
 "                        ."
 msgstr ""
 
@@ -2577,7 +2555,8 @@ msgstr ""
 msgid "Become a Reviewer"
 msgstr ""
 
-#: themes/OLH/templates/core/nav.html:47 themes/OLH/templates/press/nav.html:43
+#: themes/OLH/templates/core/nav.html:47
+#: themes/OLH/templates/press/nav.html:43
 #: themes/material/templates/core/nav.html:60
 #: themes/material/templates/core/nav.html:102
 #: themes/material/templates/press/nav.html:42
@@ -2723,12 +2702,9 @@ msgstr ""
 #: themes/OLH/templates/elements/accounts/edit_profile_body_block.html:8
 msgid ""
 "\n"
-"                <p>If you want to change your email address you may do so "
-"below, however, you will be logged out and your\n"
-"                account will be marked as inactive until you follow the "
-"instructions in the verification email. <strong>Note: </strong>\n"
-"                Changing your email address will also change your username "
-"as these are one and the same.</p>\n"
+"                <p>If you want to change your email address you may do so below, however, you will be logged out and your\n"
+"                account will be marked as inactive until you follow the instructions in the verification email. <strong>Note: </strong>\n"
+"                Changing your email address will also change your username as these are one and the same.</p>\n"
 "                "
 msgstr ""
 
@@ -2747,7 +2723,7 @@ msgstr ""
 #: themes/clean/templates/elements/accounts/edit_profile_body_block.html:27
 #: themes/material/templates/elements/accounts/edit_profile_body_block.html:20
 msgid "Update Email Address"
-msgstr ""
+msgstr "PROVA MATTEO"
 
 #: themes/OLH/templates/elements/accounts/edit_profile_body_block.html:28
 #: themes/clean/templates/elements/accounts/edit_profile_body_block.html:40
@@ -2772,7 +2748,7 @@ msgstr ""
 #: themes/clean/templates/elements/accounts/edit_profile_body_block.html:53
 #: themes/material/templates/elements/accounts/edit_profile_body_block.html:43
 msgid "Subscribe to Article Notifications"
-msgstr ""
+msgstr "TRADOTTO A META"
 
 #: themes/OLH/templates/elements/accounts/edit_profile_body_block.html:52
 #: themes/OLH/templates/elements/accounts/edit_profile_body_block.html:70
@@ -3002,8 +2978,8 @@ msgstr ""
 #: themes/OLH/templates/elements/journal/keywords_block.html:4
 #: themes/clean/templates/elements/journal/keywords_block.html:4
 msgid ""
-"Keywords used by articles in this journal are listed below. Select a keyword "
-"to view which articles use it."
+"Keywords used by articles in this journal are listed below. Select a keyword"
+" to view which articles use it."
 msgstr ""
 
 #: themes/OLH/templates/elements/journal/keywords_block.html:10
@@ -3633,10 +3609,8 @@ msgstr ""
 #: themes/OLH/templates/repository/submit_files.html:21
 msgid ""
 "To upload a file, select it\n"
-"                    using one of the 'Choose file' buttons, then upload it "
-"with the 'Upload file' button next to it. You\n"
-"                    will then be asked for some additional information "
-"(label, description etc.)"
+"                    using one of the 'Choose file' buttons, then upload it with the 'Upload file' button next to it. You\n"
+"                    will then be asked for some additional information (label, description etc.)"
 msgstr ""
 
 #: themes/OLH/templates/repository/submit_files.html:24
@@ -3655,8 +3629,8 @@ msgstr ""
 #: themes/OLH/templates/repository/submit_start.html:30
 #: themes/OLH/templates/repository/submit_start.html:71
 msgid ""
-"If you have any additional information you'd like to supply to the preprints "
-"editor, do so here"
+"If you have any additional information you'd like to supply to the preprints"
+" editor, do so here"
 msgstr ""
 
 #: themes/clean/templates/500.html:27
@@ -3665,10 +3639,8 @@ msgstr ""
 
 #: themes/clean/templates/core/accounts/orcid_registration.html:10
 msgid ""
-"The ORCiD you logged in with is not currently linked with an account in our "
-"system. You can either\n"
-"            register a new account, or login with an existing account to "
-"link your ORCiD for future use."
+"The ORCiD you logged in with is not currently linked with an account in our system. You can either\n"
+"            register a new account, or login with an existing account to link your ORCiD for future use."
 msgstr ""
 
 #: themes/clean/templates/core/accounts/orcid_registration.html:30
@@ -3702,8 +3674,7 @@ msgstr ""
 #: themes/clean/templates/core/accounts/register.html:37
 msgid ""
 "For more information read our\n"
-"                                <a href=\"#\" data-toggle=\"modal\" data-"
-"target=\"#passwordmodal\">password guide</a>\n"
+"                                <a href=\"#\" data-toggle=\"modal\" data-target=\"#passwordmodal\">password guide</a>\n"
 "                                ."
 msgstr ""
 
@@ -3711,34 +3682,28 @@ msgstr ""
 #: themes/material/templates/core/accounts/reset_password.html:23
 msgid ""
 "For more information read our\n"
-"                                    <a href=\"#passwordmodal\" class=\"modal-"
-"trigger\">password guide</a>\n"
+"                                    <a href=\"#passwordmodal\" class=\"modal-trigger\">password guide</a>\n"
 "                                    ."
 msgstr ""
 
 #: themes/clean/templates/core/accounts/reset_password.html:50
 msgid ""
-"Its a common myth that a short and complex password (Jfjfy&65^87) is more "
-"secure than a long and\n"
+"Its a common myth that a short and complex password (Jfjfy&65^87) is more secure than a long and\n"
 "                        uncomplicated password (our awesome moon base rocks)."
 msgstr ""
 
 #: themes/clean/templates/core/accounts/reset_password.html:52
 msgid ""
-"We recommend selecting a long, but easy to remember password such as <em>our "
-"awesome moon base\n"
-"                        rocks</em> which would take an estimated septillion "
-"years to crack as opposed to a complex one\n"
-"                        like <em>Jfjfy&65^87</em> which would take just over "
-"600 years on a standard computer."
+"We recommend selecting a long, but easy to remember password such as <em>our awesome moon base\n"
+"                        rocks</em> which would take an estimated septillion years to crack as opposed to a complex one\n"
+"                        like <em>Jfjfy&65^87</em> which would take just over 600 years on a standard computer."
 msgstr ""
 
 #: themes/clean/templates/elements/accounts/edit_profile_body_block.html:9
 msgid ""
 "If you want to change your email address you may do so\n"
 "                    below, however, you will be logged out and\n"
-"                    your account will be marked as inactive until you follow "
-"the\n"
+"                    your account will be marked as inactive until you follow the\n"
 "                    instructions in the verfication email."
 msgstr ""
 
@@ -3857,7 +3822,8 @@ msgstr ""
 #: themes/material/templates/core/accounts/activate_account.html:25
 msgid ""
 "There was no inactive account with this activation code found. It is "
-"possible that your account is already active, you can check by attempting to "
+"possible that your account is already active, you can check by attempting to"
+" "
 msgstr ""
 
 #: themes/material/templates/core/accounts/register.html:28
@@ -3883,12 +3849,9 @@ msgstr ""
 #: themes/material/templates/core/accounts/register.html:103
 #: themes/material/templates/core/accounts/reset_password.html:44
 msgid ""
-"We recommend selecting a long, but easy to remember password such as <i>our "
-"awesome moon base\n"
-"                rocks</i> which would take an estimated septillion years to "
-"crack as opposed to a complex one\n"
-"                like <i>Jfjfy&65^87</i> which would take just over 600 years "
-"on a standard computer."
+"We recommend selecting a long, but easy to remember password such as <i>our awesome moon base\n"
+"                rocks</i> which would take an estimated septillion years to crack as opposed to a complex one\n"
+"                like <i>Jfjfy&65^87</i> which would take just over 600 years on a standard computer."
 msgstr ""
 
 #: themes/material/templates/core/accounts/register.html:108
