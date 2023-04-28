@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-31 11:20+0200\n"
-"PO-Revision-Date: 2023-04-19 15:24+0050\n"
-"Last-Translator: b'Matteo Gamboz <gamboz@medialab.sissa.it>'\n"
+"PO-Revision-Date: 2023-04-27 14:15+0050\n"
+"Last-Translator: b'Maria Teresa Leo <leo@medialab.sissa.it>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
@@ -270,19 +270,19 @@ msgstr ""
 
 #: journal/forms.py:25
 msgid "Titles A-Z"
-msgstr ""
+msgstr "Títulos A-Z"
 
 #: journal/forms.py:26
 msgid "Titles Z-A"
-msgstr ""
+msgstr "Títulos Z-A"
 
 #: journal/forms.py:27
 msgid "Newest"
-msgstr ""
+msgstr "Más reciente"
 
 #: journal/forms.py:28
 msgid "Oldest"
-msgstr ""
+msgstr "Más viejos"
 
 #: journal/forms.py:100
 #: themes/clean/templates/core/homepage_elements/search_bar.html:20
