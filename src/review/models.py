@@ -10,12 +10,65 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext as _
 
+from review.const import EditorialDecisions as ED, ReviewerDecisions as RD
 from utils import shared
+
 
 assignment_choices = (
     ('editor', 'Editor'),
     ('section-editor', 'Section Editor'),
 )
+
+
+def all_review_decisions():
+    """
+    Review decision options presented in admin.
+    """
+    return (
+        (RD.DECISION_ACCEPT.value, 'Accept Without Revisions'),
+        (RD.DECISION_MINOR.value, 'Minor Revisions Required'),
+        (RD.DECISION_MAJOR.value, 'Major Revisions Required'),
+        (RD.DECISION_REJECT.value, 'Reject'),
+        (RD.DECISION_NO_RECOMMENDATION.value, 'No Recommendation'),
+    )
+
+
+def reviewer_decision_choices():
+    """
+    Review decision options presented to a Reviewer.
+    """
+    return (
+        (RD.DECISION_ACCEPT.value, 'Accept Without Revisions'),
+        (RD.DECISION_MINOR.value, 'Minor Revisions Required'),
+        (RD.DECISION_MAJOR.value, 'Major Revisions Required'),
+        (RD.DECISION_REJECT.value, 'Reject'),
+    )
+
+
+def review_decision():
+    return (
+        (ED.ACCEPT.value, 'Accept Without Revisions'),
+        (ED.MINOR_REVISIONS.value, 'Minor Revisions Required'),
+        (ED.MAJOR_REVISIONS.value, 'Major Revisions Required'),
+        # Preserved the inconsistent verbose name below to avoid confusion to
+        # existing section editors
+        (ED.DECLINE.value, 'Reject'),
+    )
+
+
+def review_type():
+    return (
+        ('traditional', 'Traditional'),
+        # ('annotation', 'Annotation'),
+    )
+
+
+def review_visibilty():
+    return (
+        ('open', 'Open'),
+        ('blind', 'Single Anonymous'),
+        ('double-blind', 'Double Anonymous')
+    )
 
 
 class EditorAssignment(models.Model):
@@ -33,30 +86,6 @@ class EditorAssignment(models.Model):
 
     class Meta:
         unique_together = ('article', 'editor')
-
-
-def review_decision():
-    return (
-        ('accept', 'Accept Without Revisions'),
-        ('minor_revisions', 'Minor Revisions Required'),
-        ('major_revisions', 'Major Revisions Required'),
-        ('reject', 'Reject'),
-    )
-
-
-def review_type():
-    return (
-        ('traditional', 'Traditional'),
-        # ('annotation', 'Annotation'),
-    )
-
-
-def review_visibilty():
-    return (
-        ('open', 'Open'),
-        ('blind', 'Single Anonymous'),
-        ('double-blind', 'Double Anonymous')
-    )
 
 
 class ReviewRound(models.Model):
@@ -147,7 +176,7 @@ class ReviewAssignment(models.Model):
         max_length=20,
         blank=True,
         null=True,
-        choices=review_decision(),
+        choices=all_review_decisions(),
         verbose_name='Recommendation',
     )
     competing_interests = models.TextField(blank=True, null=True,
@@ -243,7 +272,7 @@ class ReviewAssignment(models.Model):
 
     @property
     def status(self):
-        if self.decision == 'withdrawn':
+        if self.decision == RD.DECISION_WITHDRAWN.value:
             return {
                 'code': 'withdrawn',
                 'display': 'Withdrawn',
@@ -283,6 +312,15 @@ class ReviewAssignment(models.Model):
                 'date': '',
                 'reminder': 'request',
             }
+
+    def request_decision_status(self):
+        if self.decision == RD.DECISION_WITHDRAWN.value:
+            return f'Withdrawn {self.date_complete.date()}'
+        elif self.date_accepted:
+            return f'Accepted {self.date_accepted.date()}'
+        elif self.date_declined:
+            return f'Declined {self.date_declined.date()}'
+        return 'Awaiting acknowledgement'
 
     def visibility_statement(self):
         if self.for_author_consumption:
@@ -480,8 +518,8 @@ class RevisionAction(models.Model):
 
 def revision_type():
     return (
-        ('minor_revisions', 'Minor Revisions'),
-        ('major_revisions', 'Major Revisions'),
+        (ED.MINOR_REVISIONS.value, 'Minor Revisions'),
+        (ED.MAJOR_REVISIONS.value, 'Major Revisions'),
     )
 
 
@@ -548,7 +586,7 @@ class DecisionDraft(models.Model):
     )
     decision = models.CharField(
         max_length=100,
-        choices=review_decision(),
+        choices=all_review_decisions(),
         verbose_name='Draft Decision',
     )
     message_to_editor = models.TextField(
@@ -568,7 +606,7 @@ class DecisionDraft(models.Model):
 
     editor_decision = models.CharField(
         max_length=20,
-        choices=(('accept', 'Accept'), ('decline', 'Decline')),
+        choices=((ED.ACCEPT.value, 'Accept'), (ED.DECLINE.value, 'Decline')),
         null=True,
         blank=True,
     )
