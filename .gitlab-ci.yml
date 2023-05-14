@@ -79,14 +79,14 @@ build_janeway_image_jcom:
   extends:
     - .build_janeway_image
   variables:
-    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway;latest"
+    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway:production"
   rules:
-    - if: $CI_COMMIT_BRANCH == "jcom"
+    - if: $CI_COMMIT_BRANCH == "wjs-production"
 
 build_janeway_image_jcom15:
   extends:
     - .build_janeway_image
   variables:
-    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway:jcom15"
+    TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway:develop"
   rules:
-    - if: $CI_COMMIT_BRANCH == "jcom-1.5"
+    - if: $CI_COMMIT_BRANCH == "wjs-develop" || $CI_COMMIT_BRANCH == "jcom-1.5"
