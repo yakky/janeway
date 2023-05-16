@@ -59,7 +59,6 @@ deploy_to_production:
   # I wasn't able to find a way to use the group-level container registry from CI/CD
   # See https://gitlab.com/gitlab-org/gitlab/-/issues/218285
   # So here I just use the project's registry.
-  # TODO: verify that other wjs-profile-project can pull from this registry
   # (the image is used in it's test stage)
   variables:
     TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway"
