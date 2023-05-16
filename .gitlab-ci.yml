@@ -19,7 +19,7 @@ deploy_to_test:
     DEPLOY_CMD: "deploy-janeway"
   environment:
     name: jcom-test
-    url: https://janeway-test.sissamedialab.it/
+    url: https://journals-test.sissamedialab.it/
   rules:
     - if: $CI_COMMIT_BRANCH == "jcom"
 
@@ -73,7 +73,7 @@ deploy_to_production:
     - docker build --tag $TAG --cache-from $TAG --build-arg BUILDKIT_INLINE_CACHE=1 --build-arg CI_JOB_TOKEN=$CI_JOB_TOKEN --build-arg BRANCH=$CI_COMMIT_BRANCH --file ./dockerfiles/Dockerfile.wjs ./dockerfiles
     - docker push $TAG
 
-build_janeway_image_jcom:
+build_janeway_image_wjs_production:
   extends:
     - .build_janeway_image
   variables:
@@ -81,7 +81,7 @@ build_janeway_image_jcom:
   rules:
     - if: $CI_COMMIT_BRANCH == "wjs-production"
 
-build_janeway_image_jcom15:
+build_janeway_image_wjs_develop:
   extends:
     - .build_janeway_image
   variables:
