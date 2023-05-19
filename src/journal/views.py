@@ -180,9 +180,11 @@ def articles(request):
     if request.POST and 'clear' in request.POST:
         return logic.unset_article_session_variables(request)
 
-    sections = submission_models.Section.objects.filter(journal=request.journal,
-                                                                                   is_filterable=True)
-    page, show, filters, sort, redirect, active_filters = logic.handle_article_controls(request, sections)
+    sections = submission_models.Section.objects.filter(journal=request.journal, is_filterable=True)
+    page, show, filters, sort, redirect, active_filters = logic.handle_article_controls(
+        request,
+        sections,
+    )
 
     if redirect:
         return redirect
@@ -200,6 +202,8 @@ def articles(request):
         'frozenauthor_set',
     ).order_by(sort).exclude(
         pk__in=pinned_article_pks,
+    ).exclude(
+        ancestors__isnull=False,
     )
 
     paginator = Paginator(article_objects, show)
@@ -2566,4 +2570,3 @@ def manage_languages(request):
         template,
         context,
     )
-

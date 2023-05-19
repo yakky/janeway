@@ -886,6 +886,8 @@ class Issue(AbstractLastModifiedModel):
                 stage=submission_models.STAGE_PUBLISHED,
                 date_published__lte=timezone.now(),
             )
+        # Hide "children" articles, because the template shows the children inside the parent
+        issue_articles = issue_articles.exclude(ancestors__isnull=False)
 
         return issue_articles
 

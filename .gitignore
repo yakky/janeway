@@ -139,3 +139,7 @@ src/utils/management/commands/test_command.py
 *~
 # docker env
 \.env
+
+src/static/JCOM-theme
+src/themes/JCOM-theme
+.python-version
