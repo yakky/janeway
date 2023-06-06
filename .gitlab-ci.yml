@@ -36,9 +36,7 @@ deploy_to_pp:
   environment:
     name: pre-production
     url: https://serra-pp-journals.wjapp.it/
-  rules:
-    - if: $CI_COMMIT_BRANCH == "wjs-production"
-      when: manual
+  when: manual
 
 
 deploy_to_production:
