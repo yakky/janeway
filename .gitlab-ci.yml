@@ -94,7 +94,7 @@ build_janeway_image_wjs_production:
   variables:
     TAG: "$CI_REGISTRY_IMAGE/debian-python-git-janeway:production"
   rules:
-    - if: $CI_COMMIT_BRANCH == "wjs-production"
+    - if: $CI_COMMIT_BRANCH == "wjs-production" || $CI_COMMIT_BRANCH == "jcom"
 
 build_janeway_image_wjs_develop:
   extends:
