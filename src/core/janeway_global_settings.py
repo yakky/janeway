@@ -25,6 +25,9 @@ from django.contrib import messages
 
 from core import plugin_installed_apps
 
+# X_FRAME_OPTIONS must be set to SAMEORIGIN or the embedded PDF viewer will not work
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(os.path.join(BASE_DIR, "plugins"))
@@ -370,12 +373,14 @@ MESSAGE_TAGS = {
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = ''
-EMAIL_PORT = ''
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = os.environ.get(
+    'JANEWAY_EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend',
+)
+EMAIL_HOST = os.environ.get("JANEWAY_EMAIL_HOST", '')
+EMAIL_PORT = os.environ.get("JANEWAY_EMAIL_PORT", '')
+EMAIL_HOST_USER = os.environ.get("JANEWAY_EMAIL_HOST_USER", '')
+EMAIL_HOST_PASSWORD = os.environ.get("JANEWAY_EMAIL_HOST_PASSWORD", '')
+EMAIL_USE_TLS = os.environ.get("JANEWAY_EMAIL_USE_TLS", True)
 DUMMY_EMAIL_DOMAIN = "@journal.com"
 
 # Settings for use with Mailgun

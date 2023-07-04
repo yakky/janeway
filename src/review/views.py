@@ -25,7 +25,10 @@ from django.utils.translation import gettext_lazy as _
 from core import models as core_models, files, forms as core_forms, logic as core_logic
 from events import logic as event_logic
 from review import models, logic, forms, hypothesis
-from review.const import EditorialDecisions as ED
+from review.const import(
+    EditorialDecisions as ED,
+    ReviewerDecisions as RD,
+)
 from security.decorators import (
     editor_user_required, reviewer_user_required,
     reviewer_user_for_assignment_required,
@@ -1425,7 +1428,6 @@ def withdraw_review(request, article_id, review_id):
         )
 
     email_content = logic.get_withdrawl_notification(request, review)
-
     if request.POST:
         email_content = request.POST.get('content_email')
         kwargs = {'user_message_content': email_content,
@@ -1440,12 +1442,7 @@ def withdraw_review(request, article_id, review_id):
             event_logic.Events.ON_REVIEW_WITHDRAWL,
             **kwargs,
         )
-
-        review.date_complete = timezone.now()
-        review.decision = models.RD.DECISION_WITHDRAWN
-        review.is_complete = True
-        review.save()
-
+        review.withdraw()
         messages.add_message(request, messages.SUCCESS, 'Review withdrawn')
         return redirect(
             reverse(
@@ -1696,6 +1693,8 @@ def request_revisions(request, article_id):
         is_complete=True,
         for_author_consumption=False,
         date_declined__isnull=True,
+    ).exclude(
+        decision=RD.DECISION_WITHDRAWN.value,
     )
     incomplete = review_round.reviewassignment_set.filter(
         is_complete=False,
