@@ -54,14 +54,14 @@ def send_reset_token(request, reset_token):
             request.press.password_reset_text,
             template_is_setting=True,
         )
-        subject = 'Password Reset'
     else:
         message = render_template.get_message_content(
             request,
             context,
             'password_reset',
         )
-        subject = 'subject_password_reset'
+
+    subject = 'subject_password_reset'
 
     notify_helpers.send_email_with_body_from_user(
         request,
@@ -90,14 +90,14 @@ def send_confirmation_link(request, new_user):
             request.press.registration_text,
             template_is_setting=True,
         )
-        subject = 'Registration Confirmation'
     else:
         message = render_template.get_message_content(
             request,
             context,
             'new_user_registration',
         )
-        subject = 'subject_new_user_registration'
+
+    subject = 'subject_new_user_registration'
 
     notify_helpers.send_slack(
         request,
@@ -134,8 +134,10 @@ def resize_and_crop(img_path, size, crop_type='middle'):
     ratio = size[0] / float(size[1])
     # The image is scaled/cropped vertically or horizontally depending on the ratio
     if ratio > img_ratio:
-        img = img.resize((size[0], int(size[0] * img.size[1] // img.size[0])),
-                         Image.ANTIALIAS)
+        img = img.resize(
+            (size[0], int(size[0] * img.size[1] // img.size[0])),
+            Image.LANCZOS,
+        )
         # Crop in the top, middle or bottom
         if crop_type == 'top':
             box = (0, 0, img.size[0], size[1])
@@ -148,7 +150,10 @@ def resize_and_crop(img_path, size, crop_type='middle'):
         img = img.crop(box)
 
     elif ratio < img_ratio:
-        img = img.resize((size[0], int(size[0] * img.size[1] // img.size[0])), Image.ANTIALIAS)
+        img = img.resize(
+            (size[0], int(size[0] * img.size[1] // img.size[0])),
+            Image.LANCZOS,
+        )
         # Crop in the top, middle or bottom
         if crop_type == 'top':
             box = (0, 0, size[0], img.size[1])
@@ -170,7 +175,7 @@ def resize_and_crop(img_path, size, crop_type='middle'):
 
         img = img.crop(box)
     else:
-        img = img.resize((size[0], size[1]), Image.ANTIALIAS)
+        img = img.resize((size[0], size[1]), Image.LANCZOS)
 
     if img.mode == "CMYK":
         img = img.convert("RGB")
@@ -271,9 +276,6 @@ def get_settings_to_edit(display_group, journal, user):
             {'name': 'user_automatically_author',
              'object': setting_handler.get_setting('general', 'user_automatically_author', journal),
              },
-            {'name': 'submission_competing_interests',
-             'object': setting_handler.get_setting('general', 'submission_competing_interests', journal),
-             },
             {'name': 'submission_summary',
              'object': setting_handler.get_setting('general', 'submission_summary', journal),
              },
@@ -314,6 +316,13 @@ def get_settings_to_edit(display_group, journal, user):
                 'object': setting_handler.get_setting(
                     'general',
                     'data_figure_file_submission_instructions', journal
+                ),
+            },
+            {
+                'name': 'hide_editors_from_authors',
+                'object': setting_handler.get_setting(
+                    'general',
+                    'hide_editors_from_authors', journal
                 ),
             }
         ]
@@ -380,6 +389,10 @@ def get_settings_to_edit(display_group, journal, user):
                 'object': setting_handler.get_setting('general', 'enable_suggested_reviewers', journal),
             },
             {
+                'name': 'display_past_reviewers',
+                'object': setting_handler.get_setting('general', 'display_past_reviewers', journal),
+            },
+            {
                 'name': 'enable_peer_review_data_on_review_page',
                 'object': setting_handler.get_setting('general', 'enable_peer_review_data_on_review_page', journal),
             },
@@ -398,6 +411,22 @@ def get_settings_to_edit(display_group, journal, user):
             {
                 'name': 'disable_reviewer_recommendation',
                 'object': setting_handler.get_setting('general', 'disable_reviewer_recommendation', journal),
+            },
+            {
+                'name': 'enable_share_reviews_decision',
+                'object': setting_handler.get_setting('general', 'enable_share_reviews_decision', journal),
+            },
+            {
+                'name': 'display_completed_reviews_in_additional_rounds',
+                'object': setting_handler.get_setting('general', 'display_completed_reviews_in_additional_rounds', journal),
+            },
+            {
+                'name': 'share_author_response_letters',
+                'object': setting_handler.get_setting('general', 'share_author_response_letters', journal),
+            },
+            {
+                'name': 'display_completed_reviews_in_additional_rounds_text',
+                'object': setting_handler.get_setting('general', 'display_completed_reviews_in_additional_rounds_text', journal),
             },
         ]
         setting_group = 'general'
@@ -463,6 +492,8 @@ def get_settings_to_edit(display_group, journal, user):
             'display_altmetric_badge',
             'altmetric_badge_type',
             'hide_author_email_links',
+            'display_date_submitted',
+            'display_date_accepted',
         ]
         group_of_settings = process_setting_list(article_settings, 'article', journal)
         setting_group = 'article'
@@ -592,7 +623,7 @@ def handle_article_thumb_image_file(uploaded_file, article, request):
     else:
         new_file = files.overwrite_file(
                 uploaded_file,
-                article.large_image_file,
+                article.thumbnail_image_file,
                 ('articles', article.pk)
         )
         article.thumbnail_image_file = new_file
@@ -959,34 +990,6 @@ def render_nested_setting(
     )
 
     return rendered_string
-
-
-def send_email(user, form, request, article=None, preprint=None):
-    subject = form.cleaned_data['subject']
-    message = form.cleaned_data['body']
-
-    if article:
-        target = article
-    elif preprint:
-        target = preprint
-    else:
-        target = None
-
-    log_dict = {
-        'level': 'Info',
-        'action_type': 'Contact User',
-        'types': 'Email',
-        'target': target
-    }
-
-    notify_helpers.send_email_with_body_from_user(
-        request,
-        subject,
-        user.email,
-        message,
-        log_dict=log_dict,
-        cc=form.cleaned_data['cc'],
-    )
 
 
 def filter_articles_to_editor_assigned(request, articles):

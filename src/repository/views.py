@@ -4,6 +4,8 @@ __license__ = "AGPL v3"
 __maintainer__ = "Birkbeck Centre for Technology and Publishing"
 
 import operator
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -19,7 +21,12 @@ from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
 from repository import forms, logic as repository_logic, models
-from core import models as core_models, files, logic as core_logic, forms as core_forms
+from core import (
+    email as core_email,
+    files,
+    forms as core_forms,
+    models as core_models,
+)
 from journal import models as journal_models
 from submission import models as submission_models
 
@@ -364,6 +371,10 @@ def repository_search(request, search_term=None):
                 Q(account__last_name__in=split_search_term) |
                 Q(account__institution__icontains=search_term)
             )
+            &
+            (
+                Q(preprint__repository=request.repository)
+            )
         )
 
         preprints_from_author = [pa.preprint for pa in models.PreprintAuthor.objects.filter(
@@ -490,7 +501,7 @@ def repository_pdf(request, preprint_id):
 
     pdf_url = request.GET.get('file')
 
-    template = 'repository/pdf.html'
+    template = 'common/repository/pdf.html'
     context = {
         'pdf_url': pdf_url,
     }
@@ -818,8 +829,7 @@ def preprints_manager(request):
         date_declined__isnull=False,
         repository=request.repository,
     )
-    metrics_summary = repository_logic.metrics_summary(published_preprints)
-    versisons = models.VersionQueue.objects.filter(
+    versions = models.VersionQueue.objects.filter(
         date_decision__isnull=True,
         preprint__repository=request.repository,
     )
@@ -834,8 +844,7 @@ def preprints_manager(request):
         'published_preprints': published_preprints,
         'incomplete_preprints': incomplete_preprints,
         'rejected_preprints': rejected_preprints,
-        'version_queue': versisons,
-        'metrics_summary': metrics_summary,
+        'version_queue': versions,
         'subjects': subjects,
     }
 
@@ -1537,10 +1546,14 @@ def repository_wizard(request, short_name=None, step='1'):
                     )
                 )
 
-            # Bump the step by 1
-            kwargs = {'step': int(step) + 1}
-            if updated_repository:
-                kwargs['short_name'] = updated_repository.short_name
+            kwargs = {
+                'short_name': updated_repository.short_name,
+                'step': step,
+            }
+
+            if 'next' in request.POST:
+                kwargs['step'] = str(int(step) + 1)
+
             return redirect(
                 reverse(
                     'repository_wizard_with_id',
@@ -2365,9 +2378,9 @@ def send_user_email(request, user_id, preprint_id):
         form = core_forms.EmailForm(request.POST)
 
         if form.is_valid():
-            core_logic.send_email(
+            core_email.send_email(
                 user,
-                form,
+                form.as_dataclass(),
                 request,
                 article,
                 preprint,
@@ -2382,3 +2395,88 @@ def send_user_email(request, user_id, preprint_id):
         'article': article,
     }
     return render(request, template, context)
+
+
+@is_repository_manager
+def list_review_recommendations(request):
+    recommendations = models.ReviewRecommendation.objects.filter(
+        repository=request.repository,
+    )
+    if request.POST and 'delete' in request.POST:
+        recommendation_id = request.POST.get('delete')
+        try:
+            recommendation = models.ReviewRecommendation.objects.get(
+                pk=recommendation_id,
+            )
+            if not recommendation.review_set.exists():
+                recommendation.delete()
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    'Recommendation deleted.',
+                )
+            else:
+                messages.add_message(
+                    request,
+                    messages.INFO,
+                    'Recommendation is linked to reviews. You can mark it as'
+                    ' inactive if you no longer wish to use it.',
+                )
+        except models.ReviewRecommendation.DoesNotExist:
+            messages.add_message(
+                request,
+                messages.WARNING,
+                'No recommendation found with that ID.',
+            )
+        return redirect(
+            reverse(
+                'repository_list_review_recommendations'
+            )
+        )
+    template = 'admin/repository/review/list_review_recommendations.html'
+    context = {
+        'recommendations': recommendations,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )
+
+
+@is_repository_manager
+def manage_review_recommendation(request, recommendation_id=None):
+    recommendation = None
+    if recommendation_id:
+        recommendation = get_object_or_404(
+            models.ReviewRecommendation,
+            pk=recommendation_id,
+            repository=request.repository,
+        )
+    form = forms.RecommendationForm(
+        instance=recommendation,
+        repository=request.repository,
+    )
+    if request.POST:
+        form = forms.RecommendationForm(
+            request.POST,
+            instance=recommendation,
+            repository=request.repository,
+        )
+        if form.is_valid():
+            form.save()
+            return redirect(
+                reverse(
+                    'repository_list_review_recommendations'
+                )
+            )
+    template = 'admin/repository/review/manage_review_recommendation.html'
+    context = {
+        'recommendation': recommendation,
+        'form': form,
+    }
+    return render(
+        request,
+        template,
+        context,
+    )

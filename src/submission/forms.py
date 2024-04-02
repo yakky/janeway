@@ -15,6 +15,8 @@ from review.logic import render_choices
 from utils.forms import KeywordModelForm, JanewayTranslationModelForm
 from utils import setting_handler
 
+from tinymce.widgets import TinyMCE
+
 
 class PublisherNoteForm(forms.ModelForm):
 
@@ -27,7 +29,7 @@ class ArticleStart(forms.ModelForm):
 
     class Meta:
         model = models.Article
-        fields = ('publication_fees', 'submission_requirements', 'copyright_notice', 'comments_editor',
+        fields = ('publication_fees', 'submission_requirements', 'copyright_notice',
                   'competing_interests')
 
     def __init__(self, *args, **kwargs):
@@ -35,7 +37,6 @@ class ArticleStart(forms.ModelForm):
         super(ArticleStart, self).__init__(*args, **kwargs)
 
         self.fields['competing_interests'].label = ''
-        self.fields['comments_editor'].label = ''
 
         if not journal.submissionconfiguration.publication_fees:
             self.fields.pop('publication_fees')
@@ -61,28 +62,22 @@ class ArticleStart(forms.ModelForm):
         if not journal.submissionconfiguration.competing_interests:
             self.fields.pop('competing_interests')
 
-        if not journal.submissionconfiguration.comments_to_the_editor:
-            self.fields.pop('comments_editor')
-
 
 class ArticleInfo(KeywordModelForm, JanewayTranslationModelForm):
     FILTER_PUBLIC_FIELDS = False
 
     class Meta:
         model = models.Article
-        fields = ('title', 'subtitle', 'abstract', 'non_specialist_summary',
-                  'language', 'section', 'license', 'primary_issue',
-                  'article_number', 'is_remote', 'remote_url', 'peer_reviewed',
-                  'first_page', 'last_page', 'page_numbers', 'total_pages',
-                  'competing_interests', 'custom_how_to_cite', 'rights')
+        fields = (
+            'title', 'subtitle', 'abstract', 'non_specialist_summary',
+            'language', 'section', 'license', 'primary_issue',
+            'article_number', 'is_remote', 'remote_url', 'peer_reviewed',
+            'first_page', 'last_page', 'page_numbers', 'total_pages',
+            'competing_interests', 'custom_how_to_cite', 'rights',
+        )
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': _('Title')}),
             'subtitle': forms.TextInput(attrs={'placeholder': _('Subtitle')}),
-            'abstract': forms.Textarea(
-                attrs={
-                    'placeholder': _('Enter your article\'s abstract here')
-                }
-            ),
         }
 
     def __init__(self, *args, **kwargs):
@@ -100,8 +95,13 @@ class ArticleInfo(KeywordModelForm, JanewayTranslationModelForm):
         submission_summary = kwargs.pop('submission_summary', None)
         journal = kwargs.pop('journal', None)
         self.pop_disabled_fields = kwargs.pop('pop_disabled_fields', True)
-
+        editor_view = kwargs.pop('editor_view', False)
         super(ArticleInfo, self).__init__(*args, **kwargs)
+
+        # Flag labels for translation
+        for field in self.fields.values():
+            field.label = _(field.label)
+
         if 'instance' in kwargs:
             article = kwargs['instance']
             section_queryset = models.Section.objects.filter(
@@ -163,8 +163,10 @@ class ArticleInfo(KeywordModelForm, JanewayTranslationModelForm):
                             widget=forms.TextInput(attrs={'div_class': element.width}),
                             required=element.required)
                     elif element.kind == 'textarea':
-                        self.fields[element.name] = forms.CharField(widget=forms.Textarea,
-                                                                    required=element.required)
+                        self.fields[element.name] = forms.CharField(
+                                widget=TinyMCE(),
+                                required=element.required,
+                        )
                     elif element.kind == 'date':
                         self.fields[element.name] = forms.CharField(
                             widget=forms.DateInput(attrs={'class': 'datepicker', 'div_class': element.width}),
@@ -194,6 +196,12 @@ class ArticleInfo(KeywordModelForm, JanewayTranslationModelForm):
                             self.fields[element.name].initial = check_for_answer.answer
                         except models.FieldAnswer.DoesNotExist:
                             pass
+
+                    # if the editor is viewing the page, don't set additional
+                    # fields to be required.
+                    if editor_view:
+                        self.fields[element.name].required = False
+
 
     def save(self, commit=True, request=None):
         article = super(ArticleInfo, self).save(commit=False)
@@ -229,6 +237,14 @@ class EditorArticleInfoSubmit(ArticleInfo):
     # Used when an editor is making a submission.
     FILTER_PUBLIC_FIELDS = False
 
+    def __init__(self, *args, **kwargs):
+        super(EditorArticleInfoSubmit, self).__init__(*args, **kwargs)
+        if self.fields.get('section'):
+            self.fields['section'].label_from_instance = lambda obj: obj.display_name_public_submission
+            self.fields['section'].help_text = "As an editor you will see all " \
+                                               "sections even if they are  " \
+                                               "closed for public submission"
+
 
 class AuthorForm(forms.ModelForm):
 
@@ -253,17 +269,17 @@ class AuthorForm(forms.ModelForm):
 
         widgets = {
             'first_name': forms.TextInput(attrs={'placeholder': 'First name'}),
-            'middle_name': forms.TextInput(attrs={'placeholder': 'Middle name'}),
-            'last_name': forms.TextInput(attrs={'placeholder': 'Last name'}),
+            'middle_name': forms.TextInput(attrs={'placeholder': _('Middle name')}),
+            'last_name': forms.TextInput(attrs={'placeholder': _('Last name')}),
             'biography': forms.Textarea(
-                attrs={'placeholder': 'Enter biography here'}),
-            'institution': forms.TextInput(attrs={'placeholder': 'Institution'}),
-            'department': forms.TextInput(attrs={'placeholder': 'Department'}),
-            'twitter': forms.TextInput(attrs={'placeholder': 'Twitter handle'}),
-            'linkedin': forms.TextInput(attrs={'placeholder': 'LinkedIn profile'}),
-            'impactstory': forms.TextInput(attrs={'placeholder': 'ImpactStory profile'}),
-            'orcid': forms.TextInput(attrs={'placeholder': 'ORCID ID'}),
-            'email': forms.TextInput(attrs={'placeholder': 'Email address'}),
+                attrs={'placeholder': _('Enter biography here')}),
+            'institution': forms.TextInput(attrs={'placeholder': _('Institution')}),
+            'department': forms.TextInput(attrs={'placeholder': _('Department')}),
+            'twitter': forms.TextInput(attrs={'placeholder': _('Twitter handle')}),
+            'linkedin': forms.TextInput(attrs={'placeholder': _('LinkedIn profile')}),
+            'impactstory': forms.TextInput(attrs={'placeholder': _('ImpactStory profile')}),
+            'orcid': forms.TextInput(attrs={'placeholder': _('ORCID ID')}),
+            'email': forms.TextInput(attrs={'placeholder': _('Email address')}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -274,16 +290,28 @@ class AuthorForm(forms.ModelForm):
 
     def clean_orcid(self):
         orcid_string = self.cleaned_data.get('orcid')
-        print(orcid_string)
         try:
             return utility_clean_orcid(orcid_string)
         except ValueError:
             self.add_error(
                 'orcid',
-                'An ORCID must be in the pattern https://orcid.org/0000-0000-0000-0000 or'
-                ' 0000-0000-0000-0000',
+                 'An ORCID must be entered in the pattern '
+                'https://orcid.org/0000-0000-0000-0000 or'
+                ' 0000-0000-0000-0000. You can find out '
+                'about valid ORCID patterns on the ORCID support site: '
+                'https://support.orcid.org/hc/en-us/articles/'
+                '360006897674-Structure-of-the-ORCID-Identifier',
             )
         return orcid_string
+
+
+class SubmissionCommentsForm(forms.ModelForm):
+    class Meta:
+        model = models.Article
+        fields = ('comments_editor',)
+        labels = {
+            'comments_editor': '',
+        }
 
 
 class FileDetails(forms.ModelForm):
@@ -363,8 +391,12 @@ class EditFrozenAuthor(forms.ModelForm):
         except ValueError:
             self.add_error(
                 'frozen_orcid',
-                'An ORCID must be in the pattern https://orcid.org/0000-0000-0000-0000 or'
-                ' 0000-0000-0000-0000',
+                'An ORCID must be entered in the pattern '
+                'https://orcid.org/0000-0000-0000-0000 or'
+                ' 0000-0000-0000-0000. You can find out '
+                'about valid ORCID patterns on the ORCID support site: '
+                'https://support.orcid.org/hc/en-us/articles/'
+                '360006897674-Structure-of-the-ORCID-Identifier',
             )
         return orcid_string
 
@@ -476,12 +508,13 @@ class FunderForm(forms.ModelForm):
             self.article.save()
         return funder
 
+
 def utility_clean_orcid(orcid):
     """
     Utility function that cleans an ORCID ID.
     """
     if orcid:
-        orcid_regex = re.compile('([0]{4})-([0-9]{4})-([0-9]{4})-([0-9]{3})([0-9X]{1})')
+        orcid_regex = re.compile('([0]{3})([0,9]{1})-([0-9]{4})-([0-9]{4})-([0-9]{3})([0-9X]{1})')
         result = orcid_regex.search(orcid)
 
         if result:

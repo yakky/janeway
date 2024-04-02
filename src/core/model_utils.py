@@ -11,6 +11,7 @@ import re
 import sys
 
 from django import forms
+from django.apps import apps
 from django.contrib.postgres.lookups import SearchLookup as PGSearchLookup
 from django.contrib.postgres.search import (
     SearchVector as DjangoSearchVector,
@@ -22,6 +23,7 @@ from django.db import(
     connection,
     IntegrityError,
     models,
+    ProgrammingError,
     transaction,
 )
 from django.db.models import fields, Q, Manager
@@ -40,13 +42,13 @@ from django.utils.functional import cached_property
 from django.utils import translation, timezone
 from django.conf import settings
 from django.db.models.query import QuerySet
+from django_bleach.models import BleachField
 
 from modeltranslation.manager import MultilingualManager, MultilingualQuerySet
 from modeltranslation.utils import auto_populate
 from PIL import Image
 import xml.etree.cElementTree as et
 
-from utils import logic
 from utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -96,11 +98,18 @@ class AbstractSiteModel(models.Model):
         return obj
 
     def site_url(self, path=None):
+        # This is here to avoid circular imports
+        from utils import logic
         return logic.build_url(
             netloc=self.domain,
-            scheme=self.SCHEMES[self.is_secure],
+            scheme=self._get_scheme(),
             path=path or "",
         )
+    def _get_scheme(self):
+        scheme = self.SCHEMES[self.is_secure]
+        if settings.DEBUG is True:
+            scheme = self.SCHEMES[False]
+        return scheme
 
 
 class PGCaseInsensitivedMixin():
@@ -561,3 +570,45 @@ class SearchVector(DjangoSearchVector):
     # Override template to ignore function
     function = None
     template = '%(expressions)s'
+
+
+class JanewayBleachField(BleachField):
+    """ An override of BleachField to avoid casting SafeString from db
+    Bleachfield automatically casts the default return type (string) into
+    a SafeString, which is okay when using the value for HTML rendering but
+    not when using the value elsewhere (XML encoding)
+    https://github.com/marksweb/django-bleach/blob/504b3784c525886ba1974eb9ecbff89314688491/django_bleach/models.py#L76
+    """
+    def from_db_value(self, value,expression, connection):
+        return value
+
+    def pre_save(self, model_instance, *args, **kwargs):
+        data = getattr(model_instance, self.attname)
+        try:
+            return super().pre_save(model_instance, *args, **kwargs)
+        except TypeError:
+            # Gracefully ignore typerrors on BleachField
+            return data
+
+
+class JanewayBleachCharField(JanewayBleachField):
+    """ An override of BleachField to use a TextInput but get sanitization"""
+    def formfield(self, **kwargs):
+        kwargs["widget"] = forms.TextInput()
+        return super().formfield(**kwargs)
+
+
+def default_press():
+    try:
+        Press = apps.get_model("press", "Press")
+        return Press.objects.first()
+    except ProgrammingError:
+        # Initial migration will attempt to call this,
+        # even when no EditorialGroups are created
+        return
+
+
+def default_press_id():
+    default_press_obj = default_press()
+    if default_press_obj:
+        return default_press_obj.pk

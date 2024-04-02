@@ -30,7 +30,7 @@ class ArticleFKModelAdmin(admin.ModelAdmin):
     """
 
     def _journal(self, obj):
-        return obj.article.journal if obj else ''
+        return obj.article.journal if obj and obj.article else ''
 
     def _article(self, obj):
         return truncatewords_html(str(obj.article), 5) if obj else ''
@@ -207,6 +207,13 @@ class FileInline(admin.TabularInline):
 class EditorialGroupMemberInline(admin.TabularInline):
     model = core_models.EditorialGroupMember
     extra = 0
+    raw_id_fields = ('user',)
+
+
+class StaffGroupMemberInline(admin.TabularInline):
+    model = press_models.StaffGroupMember
+    extra = 0
+    exclude = ('alternate_title', 'publications')
     raw_id_fields = ('user',)
 
 
