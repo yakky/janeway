@@ -15,16 +15,17 @@ RUN --mount=type=cache,mode=0755,target=/var/cache/apt \
     apt-get install -y mariadb-client && \
     apt-get install -y libmariadb-dev && \
     apt-get install -y libssl-dev && \
-    apt-get install -y postgresql-client && \
-    echo "Cloning Janeway code..." && \
+    apt-get install -y postgresql-client
+RUN echo "Cloning Janeway code ${BRANCH}..." && \
     git clone --branch ${BRANCH} --single-branch https://github.com/sissamedialab/janeway.git && \
-    cd janeway && \
-    git checkout origin/${BRANCH} && \
-    echo "Installing Janeway requirements..." && \
+    cd /janeway && \
+    git checkout origin/${BRANCH}
+COPY requirements.txt /janeway/requirements.txt
+RUN echo  "Installing Janeway requirements..." && \
     # sed -i 's/jsmin.*/jsmin/' requirements.txt && \
-    sed -i '/mysqlclient/d' requirements.txt && \
+    sed -i '/mysqlclient/d' /janeway/requirements.txt && \
     pip install 'setuptools<58'  && \
-    pip install -r requirements.txt && \
+    pip install -r /janeway/requirements.txt && \
     echo "Cloning typesetting plugin at tag v1.3.0-RC-1..." && \
     cd / && git clone --branch v1.3.0-RC-1 --single-branch https://github.com/BirkbeckCTP/typesetting && \
     ln -s /typesetting /janeway/src/plugins/
