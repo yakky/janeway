@@ -48,8 +48,7 @@ from press import forms as press_forms
 from utils import models as util_models, setting_handler, orcid
 from utils.logger import get_logger
 from utils.decorators import GET_language_override
-from utils.shared import language_override_redirect
-from utils.logic import get_janeway_version
+from utils.shared import language_override_redirect, clear_cache
 from repository import models as rm
 from events import logic as events_logic
 
@@ -1639,26 +1638,55 @@ def contacts_order(request):
 
 
 @editor_user_required
+@GET_language_override
 def editorial_team(request):
     """
     Displays a list of EditorialGroup objects, allows them to be deleted and created,
     :param request: HttpRequest object
     :return: HttpResponse object
     """
-    editorial_groups = models.EditorialGroup.objects.filter(journal=request.journal)
+    with translation.override(request.override_language):
+        editorial_groups = models.EditorialGroup.objects.filter(
+            journal=request.journal,
+        )
+        settings, setting_group = logic.get_settings_to_edit(
+            'editorial',
+            request.journal,
+            request.user,
+        )
+        edit_form = forms.GeneratedSettingForm(settings=settings)
+        if request.POST:
+            edit_form = forms.GeneratedSettingForm(
+                request.POST,
+                settings=settings,
+            )
 
-    if 'delete' in request.POST:
-        delete_id = request.POST.get('delete')
-        group = get_object_or_404(models.EditorialGroup, pk=delete_id, journal=request.journal)
-        group.delete()
-        return redirect(reverse('core_editorial_team'))
+            if edit_form.is_valid():
+                edit_form.save(
+                    group=setting_group,
+                    journal=request.journal,
+                )
+                # clear cache to ensure changes display immediately
+                clear_cache()
+                return language_override_redirect(
+                    request,
+                    'core_editorial_team',
+                    kwargs={},
+                )
 
-    template = 'core/manager/editorial/index.html'
-    context = {
-        'editorial_groups': editorial_groups,
-    }
+        if 'delete' in request.POST:
+            delete_id = request.POST.get('delete')
+            group = get_object_or_404(models.EditorialGroup, pk=delete_id, journal=request.journal)
+            group.delete()
+            return redirect(reverse('core_editorial_team'))
 
-    return render(request, template, context)
+        template = 'core/manager/editorial/index.html'
+        context = {
+            'editorial_groups': editorial_groups,
+            'edit_form': edit_form,
+        }
+
+        return render(request, template, context)
 
 
 @editor_user_required

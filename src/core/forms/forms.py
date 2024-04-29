@@ -87,7 +87,6 @@ class JournalContactForm(JanewayTranslationModelForm):
 
 class EditorialGroupForm(JanewayTranslationModelForm):
 
-
     def __init__(self, *args, **kwargs):
         next_sequence = kwargs.pop('next_sequence', None)
         super(EditorialGroupForm, self).__init__(*args, **kwargs)
@@ -96,7 +95,7 @@ class EditorialGroupForm(JanewayTranslationModelForm):
 
     class Meta:
         model = models.EditorialGroup
-        fields = ('name', 'description', 'sequence',)
+        fields = ('name', 'description', 'sequence', 'display_profile_images')
         exclude = ('journal', 'press')
 
 
@@ -370,8 +369,9 @@ class JournalImageForm(forms.ModelForm):
     class Meta:
         model = journal_models.Journal
         fields = (
-           'header_image', 'default_cover_image',
-           'default_large_image', 'favicon', 'press_image_override',
+            'header_image', 'default_cover_image',
+            'default_large_image', 'favicon', 'press_image_override',
+            'default_profile_image',
         )
 
 
@@ -816,3 +816,11 @@ class SettingEmailForm(EmailForm):
             email_context,
             setting_name,
         )
+
+class SimpleTinyMCEForm(forms.Form):
+    """ A one-field form for populating a TinyMCE textarea
+    """
+
+    def __init__(self, field_name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields[field_name] = forms.CharField(widget=TinyMCE)

@@ -1519,25 +1519,6 @@
     },
     {
         "group": {
-            "name": "styling"
-        },
-        "setting": {
-            "description": "If checked, Editorial Team images will display.",
-            "is_translatable": false,
-            "name": "enable_editorial_images",
-            "pretty_name": "Enable Editorial Team Image Display",
-            "type": "boolean"
-        },
-        "value": {
-            "default": ""
-        },
-        "editable_by": [
-            "editor",
-            "journal-manager"
-        ]
-    },
-    {
-        "group": {
             "name": "general"
         },
         "setting": {
@@ -4030,25 +4011,6 @@
             "name": "general"
         },
         "setting": {
-            "description": "When this setting is enabled the review assignment page will show a table of reviewers who have completed a review in past review rounds.",
-            "is_translatable": false,
-            "name": "display_past_reviewers",
-            "pretty_name": "Display List of Reviewers from Past Review Rounds",
-            "type": "boolean"
-        },
-        "value": {
-            "default": ""
-        },
-        "editable_by": [
-            "editor",
-            "journal-manager"
-        ]
-    },
-    {
-        "group": {
-            "name": "general"
-        },
-        "setting": {
             "description": "If enabled, authors will see the requested, due, and complete date for their article's review assignments on review pages.",
             "is_translatable": false,
             "name": "enable_peer_review_data_on_review_page",
@@ -5097,6 +5059,44 @@
         },
         "value": {
             "default": "on"
+        },
+        "editable_by": [
+            "editor",
+            "journal-manager"
+        ]
+    },
+    {
+        "group": {
+            "name": "styling"
+        },
+        "setting": {
+            "description": "Display name for the page displaying editorial groups.",
+            "is_translatable": true,
+            "name": "editorial_group_page_name",
+            "pretty_name": "Editorial Group Page Name",
+            "type": "char"
+        },
+        "value": {
+            "default": "Editorial Team"
+        },
+        "editable_by": [
+            "editor",
+            "journal-manager"
+        ]
+    },
+    {
+        "group": {
+            "name": "styling"
+        },
+        "setting": {
+            "description": "When enabled no group names are displayed on the editorial group page.",
+            "is_translatable": false,
+            "name": "hide_editorial_group_names",
+            "pretty_name": "Hide Editorial Group Names",
+            "type": "boolean"
+        },
+        "value": {
+            "default": ""
         },
         "editable_by": [
             "editor",

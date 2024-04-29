@@ -307,10 +307,15 @@ STAGE_CHOICES = [
 PLUGIN_WORKFLOW_STAGES = []
 
 
-class Funder(models.Model):
+class ArticleFunding(models.Model):
     class Meta:
         ordering = ('name',)
 
+    article = models.ForeignKey(
+        'submission.Article',
+        on_delete=models.CASCADE,
+        null=True,
+    )
     name = models.CharField(
         max_length=500,
         blank=False,
@@ -323,7 +328,7 @@ class Funder(models.Model):
         null=True,
         help_text='Funder DOI (optional). Enter as a full Uniform '
                   'Resource Identifier (URI), such as '
-                  'http://dx.doi.org/10.13039/501100021082',
+                  'https://dx.doi.org/10.13039/501100021082',
     )
     funding_id = models.CharField(
         max_length=500,
@@ -331,6 +336,13 @@ class Funder(models.Model):
         null=True,
         help_text="The grant ID (optional). Enter the ID by itself",
     )
+    funding_statement = models.TextField(
+        blank=True,
+        help_text=_("Additional information regarding this funding entry")
+    )
+
+    def __str__(self):
+        return f"Article funding entry {self.pk}: {self.name}"
 
 
 class ArticleStageLog(models.Model):
@@ -821,9 +833,6 @@ class Article(AbstractLastModifiedModel):
         on_delete=models.SET_NULL,
     )
 
-    # funding
-    funders = models.ManyToManyField('Funder', blank=True)
-
     reviews_shared = models.BooleanField(
         default=False,
         help_text="Marked true when an editor manually shares reviews with "
@@ -1159,6 +1168,11 @@ class Article(AbstractLastModifiedModel):
             for_author_consumption=True,
         )
 
+    @property
+    def funders(self):
+        """Method replaces the funders m2m model for backwards compat."""
+        return ArticleFunding.objects.filter(article=self)
+
     def __str__(self):
         return u'%s - %s' % (self.pk, truncatesmart(self.title))
 
@@ -1418,8 +1432,8 @@ class Article(AbstractLastModifiedModel):
         elif user in self.section_editors():
             return True
         elif not user.is_anonymous and user.is_editor(
-                request=None,
-                journal=self.journal,
+            request=None,
+            journal=self.journal,
         ):
             return True
         else:
