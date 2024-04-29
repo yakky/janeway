@@ -24,8 +24,7 @@ COPY requirements.txt /janeway/requirements.txt
 RUN echo  "Installing Janeway requirements..." && \
     # sed -i 's/jsmin.*/jsmin/' requirements.txt && \
     sed -i '/mysqlclient/d' /janeway/requirements.txt && \
-    pip install 'setuptools<58'  && \
     pip install -r /janeway/requirements.txt && \
     echo "Cloning typesetting plugin at tag v1.3.0-RC-1..." && \
-    cd / && git clone --branch v1.3.0-RC-1 --single-branch https://github.com/BirkbeckCTP/typesetting && \
+    cd / && git clone --branch master --single-branch https://github.com/BirkbeckCTP/typesetting && \
     ln -s /typesetting /janeway/src/plugins/
