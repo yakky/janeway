@@ -40,6 +40,7 @@ from core.file_system import JanewayFileSystemStorage
 from core.model_utils import (
     AbstractLastModifiedModel,
     AbstractSiteModel,
+    DynamicChoiceField,
     JanewayBleachField,
     PGCaseInsensitiveEmailField,
     SearchLookup,
@@ -267,7 +268,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
         verbose_name=_('Country'),
         on_delete=models.SET_NULL,
     )
-    preferred_timezone = models.CharField(max_length=300, null=True, blank=True, choices=TIMEZONE_CHOICES, verbose_name=_("Preferred Timezone"))
+    preferred_timezone = DynamicChoiceField(
+            max_length=300, null=True, blank=True,
+            choices=tuple(),
+            dynamic_choices=TIMEZONE_CHOICES,
+            verbose_name=_("Preferred Timezone")
+        )
 
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -960,8 +966,8 @@ class File(AbstractLastModifiedModel):
                 kwargs=url_kwargs,
             )
 
-    def get_file(self, article):
-        return files.get_file(self, article)
+    def get_file(self, article, as_bytes=False):
+        return files.get_file(self, article, as_bytes=as_bytes)
 
     def get_file_path(self, article):
         return os.path.join(settings.BASE_DIR, 'files', 'articles', str(article.id), str(self.uuid_filename))
@@ -1533,7 +1539,7 @@ class Contacts(models.Model):
 
 
 class Contact(models.Model):
-    recipient = models.EmailField(max_length=200, verbose_name=_('Who would you like to contact'))
+    recipient = models.EmailField(max_length=200, verbose_name=_('Who would you like to contact?'))
     sender = models.EmailField(max_length=200, verbose_name=_('Your contact email address'))
     subject = models.CharField(max_length=300, verbose_name=_('Subject'))
     body = JanewayBleachField(verbose_name=_('Your message'))
